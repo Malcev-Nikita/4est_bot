@@ -4,10 +4,10 @@ from aiogram import Bot, Dispatcher
 
 TOKEN = "5986825673:AAEVQNsig6A-QsMjZj_piIQ_n60M3Mc8yh0"
 
-STORAGE = storage = MemoryStorage()
+STORAGE = MemoryStorage()
 
 bot = Bot(token=TOKEN)
-dp = Dispatcher(bot, storage=storage)
+dp = Dispatcher(bot, storage=STORAGE)
 
 HOST = 'localhost'
 USER = 'root'
