@@ -65,3 +65,8 @@ def commands_handler(dp: Dispatcher):
     dp.register_message_handler(cancel_handler, commands=['cancel'])
     dp.register_message_handler(admin_handler, commands=['admin'])
     dp.register_message_handler(menu_handler, commands=['menu'])
+
+## start - 
+## cancel - 
+## admin - 
+## menu - 
