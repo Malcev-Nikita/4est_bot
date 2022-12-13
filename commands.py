@@ -2,7 +2,7 @@ from aiogram import Dispatcher, types
 from aiogram.dispatcher import FSMContext
 
 from CLASS.DataBase import DataBase
-from keyboards import register_kb, admin_kb, menu
+from keyboards import register_kb, admin_kb, menu_kb
 
 
 async def start_handler(message: types.Message, state: FSMContext):
@@ -18,7 +18,7 @@ async def start_handler(message: types.Message, state: FSMContext):
         await message.answer('Ты ещё не зарегистрировался', reply_markup = register_kb)
 
     else:
-        await message.answer('Ты уже есть в системе', reply_markup = menu)
+        await message.answer('Ты уже есть в системе', reply_markup = menu_kb)
 
 
 async def cancel_handler(message: types.Message, state: FSMContext):
@@ -57,7 +57,7 @@ async def menu_handler(message: types.Message, state: FSMContext):
         await message.answer('Ты ещё не зарегистрировался', reply_markup = register_kb)
 
     else:
-        await message.answer('Меню', reply_markup = menu)
+        await message.answer('Меню', reply_markup = menu_kb)
 
 
 def commands_handler(dp: Dispatcher):
