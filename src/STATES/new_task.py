@@ -3,8 +3,8 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from datetime import datetime
 
-from CLASS.DataBase import DataBase
-from keyboards import users_kb, confirmation_kb, admin_kb
+from ..CLASS.DataBase import DataBase
+from ..keyboards import users_kb, confirmation_kb, admin_kb
 
 
 users = []

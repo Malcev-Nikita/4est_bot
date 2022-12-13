@@ -1,7 +1,7 @@
 import pymysql
 import pymysql.cursors
 
-from config import HOST, USER, PASSWD, DB
+from ..config import HOST, USER, PASSWD, DB
 
 class DataBase():
 

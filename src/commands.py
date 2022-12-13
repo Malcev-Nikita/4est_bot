@@ -1,8 +1,8 @@
 from aiogram import Dispatcher, types
 from aiogram.dispatcher import FSMContext
 
-from CLASS.DataBase import DataBase
-from keyboards import register_kb, admin_kb, menu_kb
+from .CLASS.DataBase import DataBase
+from .keyboards import register_kb, admin_kb, menu_kb
 
 
 async def start_handler(message: types.Message, state: FSMContext):
@@ -19,13 +19,6 @@ async def start_handler(message: types.Message, state: FSMContext):
 
     else:
         await message.answer('Ты уже есть в системе', reply_markup = menu_kb)
-
-
-async def cancel_handler(message: types.Message, state: FSMContext):
-
-    await state.reset_state()
-
-    await message.answer("Ваш прогресс сброшен")
 
 
 async def admin_handler(message: types.Message, state: FSMContext):
@@ -62,11 +55,9 @@ async def menu_handler(message: types.Message, state: FSMContext):
 
 def commands_handler(dp: Dispatcher):
     dp.register_message_handler(start_handler, commands=['start'])
-    dp.register_message_handler(cancel_handler, commands=['cancel'])
     dp.register_message_handler(admin_handler, commands=['admin'])
     dp.register_message_handler(menu_handler, commands=['menu'])
 
 ## start - 
-## cancel - 
 ## admin - 
 ## menu - 

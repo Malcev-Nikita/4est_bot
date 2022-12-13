@@ -1,11 +1,11 @@
 from aiogram import executor
 import logging
 
-from config import dp
+from src.config import dp
 
-from commands import commands_handler
-from STATES.unregistered_user import register_handlers_telegram_start
-from STATES.new_task import register_handlers_new_tasks
+from src.commands import commands_handler
+from src.STATES.unregistered_user import register_handlers_telegram_start
+from src.STATES.new_task import register_handlers_new_tasks
 
 
 logging.basicConfig(level=logging.INFO)

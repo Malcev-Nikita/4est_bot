@@ -2,8 +2,8 @@ from aiogram import Dispatcher, types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
 
-from CLASS.DataBase import DataBase
-from keyboards import role_kb, role_arr
+from ..CLASS.DataBase import DataBase
+from ..keyboards import role_kb, role_arr
 
 
 class unregistered_user(StatesGroup):
