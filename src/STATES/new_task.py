@@ -61,8 +61,6 @@ async def confirmation(call: types.CallbackQuery, state: FSMContext):
     await call.message.answer("Задача создана", reply_markup = admin_kb)
 
 
-
-## Регистрируем обработчики событий ############################################
 def register_handlers_new_tasks(dp: Dispatcher):
     dp.register_callback_query_handler(start_task, lambda call: call.data == 'new_task', state = '*')
     dp.register_callback_query_handler(nickname, lambda call: call.data in users, state = new_task.nickname)

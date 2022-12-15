@@ -41,7 +41,6 @@ async def role(call: types.CallbackQuery, state: FSMContext):
     await state.finish()
 
 
-## Регистрируем обработчики событий ############################################
 def register_handlers_telegram_start(dp: Dispatcher):
     dp.register_callback_query_handler(start_register, lambda call: call.data == 'register', state = '*')
     dp.register_message_handler(nickname, state = unregistered_user.nickname)
