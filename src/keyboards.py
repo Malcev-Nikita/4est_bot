@@ -12,7 +12,10 @@ new_task = InlineKeyboardButton('Создать новую задачу', callba
 tasks_today = InlineKeyboardButton('Задачи на сегодня', callback_data = 'tasks_today')
 
 confirm = InlineKeyboardButton('Подтвердить', callback_data = 'confirm')
-reject = InlineKeyboardButton('Отклонить', callback_data = 'reject')
+reject = InlineKeyboardButton('Отклонить', callback_data = 'menu')
+
+everyday_task = InlineKeyboardButton('Ежедневная задача', callback_data = 'everyday_task')
+date_task = InlineKeyboardButton('Календарь', callback_data = 'date_task')
 
 ## Клавиатуры
 role_kb = InlineKeyboardMarkup().add(tattoo_master, barber)
@@ -20,6 +23,7 @@ register_kb = InlineKeyboardMarkup().add(register)
 admin_kb = InlineKeyboardMarkup().add(menu, new_task)
 menu_kb = InlineKeyboardMarkup().add(tasks_today)
 confirmation_kb = InlineKeyboardMarkup().add(confirm, reject)
+task_type_kb = InlineKeyboardMarkup().add(everyday_task, date_task)
 
 def users_kb(users: str) -> InlineKeyboardMarkup:
     markup = InlineKeyboardMarkup(row_width = 3)
@@ -30,3 +34,4 @@ def users_kb(users: str) -> InlineKeyboardMarkup:
 
 role_arr = ['tattoo_master', 'barber']
 confirmation_arr = ['confirm', 'reject']
+task_type_arr = ['everyday_task', 'date_task']

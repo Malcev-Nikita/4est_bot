@@ -54,9 +54,9 @@ async def menu_handler(message: types.Message, state: FSMContext):
 
 
 def commands_handler(dp: Dispatcher):
-    dp.register_message_handler(start_handler, commands=['start'])
-    dp.register_message_handler(admin_handler, commands=['admin'])
-    dp.register_message_handler(menu_handler, commands=['menu'])
+    dp.register_message_handler(start_handler, commands=['start'], state = '*')
+    dp.register_message_handler(admin_handler, commands=['admin'], state = '*')
+    dp.register_message_handler(menu_handler, commands=['menu'], state = '*')
 
 ## start - 
 ## admin - 
