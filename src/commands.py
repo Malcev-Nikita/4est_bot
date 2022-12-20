@@ -3,9 +3,12 @@ from aiogram.dispatcher import FSMContext
 
 from .CLASS.DataBase import DataBase
 from .keyboards import register_kb, admin_kb, menu_kb
+from .functions import delete_messages 
 
 
 async def start_handler(message: types.Message, state: FSMContext):
+
+    await delete_messages(message)
 
     await state.reset_state()
 
@@ -15,13 +18,15 @@ async def start_handler(message: types.Message, state: FSMContext):
     res = DB.SQL(f"SELECT telegram_id FROM users WHERE telegram_id = {telegram_id}")
 
     if (len(res) == 0):
-        await message.answer('Ты ещё не зарегистрировался', reply_markup = register_kb)
+        await message.answer("<b>Ты ещё не зарегистрировался</b> \n\nЖми на кнопку ниже, чтобы пройти регистрацию!", reply_markup = register_kb)
 
     else:
-        await message.answer('Ты уже есть в системе', reply_markup = menu_kb)
+        await message.answer("<b>Ты уже есть в системе.</b> \n\nМожешь нажать на кнопку ниже или воспользоваться меню комманд. \nP.S. Она находится либо внизу слева, либо внизу справа.", reply_markup = menu_kb)
 
 
 async def admin_handler(message: types.Message, state: FSMContext):
+
+    await delete_messages(message)
 
     await state.reset_state()
 
@@ -38,6 +43,8 @@ async def admin_handler(message: types.Message, state: FSMContext):
 
 
 async def menu_handler(message: types.Message, state: FSMContext):
+
+    await delete_messages(message)
 
     await state.reset_state()
 
@@ -58,6 +65,6 @@ def commands_handler(dp: Dispatcher):
     dp.register_message_handler(admin_handler, commands=['admin'], state = '*')
     dp.register_message_handler(menu_handler, commands=['menu'], state = '*')
 
-## start - 
-## admin - 
-## menu - 
+## start - Команда для того, чтобы начать диалог с ботом
+## admin - Команда для того, чтобы перейти в Админ панель
+## menu - Команда для того, чтобы перейти в меню бота

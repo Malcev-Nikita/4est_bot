@@ -4,6 +4,7 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 
 from ..CLASS.DataBase import DataBase
 from ..keyboards import role_kb, role_arr
+from ..functions import delete_messages, delete_call_messages
 
 
 class unregistered_user(StatesGroup):
@@ -13,22 +14,27 @@ class unregistered_user(StatesGroup):
 
 async def start_register(call: types.CallbackQuery, state: FSMContext):
 
-    await call.message.answer("Введи своё имя")
+    await delete_call_messages(call)
+
+    await call.message.answer("<b>Введи своё имя.</b> \n\nЭто имя будет отображаться админам бота!", parse_mode = "MarkdownV2")
 
     await state.set_state(unregistered_user.nickname.state)
 
 
 async def nickname(message: types.Message, state: FSMContext):
 
+    await delete_messages(message)
+
     await state.update_data(nickname = message.text)
 
     await state.set_state(unregistered_user.role.state)
 
-    await message.answer("Отлично! Я запомнил твоё имя. Теперь выбери кто ты", 
-                         reply_markup = role_kb)
+    await message.answer("<b>Отлично!</b> Я запомнил твоё имя. \n\nТеперь выбери кто ты", reply_markup = role_kb, parse_mode = "MarkdownV2")
 
 
 async def role(call: types.CallbackQuery, state: FSMContext):
+
+    await delete_call_messages(call)
 
     await state.update_data(role = call.data)
     data = await state.get_data()
@@ -36,7 +42,7 @@ async def role(call: types.CallbackQuery, state: FSMContext):
     DB = DataBase()
     DB.SQL(f"INSERT INTO users (telegram_id, nickname, role) VALUES ({call.from_user.id}, '{data['nickname']}', '{data['role']}')")
 
-    await call.message.answer("Отлично! Ты зарегистрирован")
+    await call.message.answer("<b>Отлично!</b> Ты зарегистрирован")
 
     await state.finish()
 
