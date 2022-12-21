@@ -7,6 +7,7 @@ from src.commands import commands_handler
 from src.STATES.unregistered_user import register_handlers_telegram_start
 from src.STATES.new_task import register_handlers_new_tasks
 from src.call_buttons import register_handlers_call_buttons
+from src.STATES.new_task_me import register_handlers_new_tasks_me
 
 
 logging.basicConfig(level=logging.INFO)
@@ -16,6 +17,7 @@ commands_handler(dp)
 register_handlers_telegram_start(dp)
 register_handlers_new_tasks(dp)
 register_handlers_call_buttons(dp)
+register_handlers_new_tasks_me(dp)
 
 if __name__ == '__main__':
     executor.start_polling(dp, skip_updates = True)

@@ -116,19 +116,19 @@ async def confirmation(call: types.CallbackQuery, state: FSMContext):
     data = await state.get_data()
 
     DB = DataBase()
+    telegram_id = DB.SQL(f"SELECT `telegram_id` FROM `users` WHERE `nickname` = '{data['nickname']}'")
 
     if (data['task_type'] == 'everyday_task'):
-        res = DB.SQL(f"SELECT `everyday_tasks` FROM `users` WHERE `telegram_id` = {call.from_user.id}")
+        res = DB.SQL(f"SELECT `everyday_tasks` FROM `users` WHERE `telegram_id` = {telegram_id[0][0]}")
 
         if (res[0][0] != None):
             task_update = res[0][0] + ', ' + data['task']
         else:
             task_update = data['task']
 
-        DB.SQL(f"UPDATE `users` SET `everyday_tasks` = '{task_update}' WHERE `telegram_id` = {call.from_user.id}")
+        DB.SQL(f"UPDATE `users` SET `everyday_tasks` = '{task_update}' WHERE `telegram_id` = {telegram_id[0][0]}")
 
     else:
-        telegram_id = DB.SQL(f"SELECT `telegram_id` FROM `users` WHERE `nickname` = '{data['nickname']}'")
         DB.SQL(f"INSERT INTO `tasks`(`telegram_id`, `nickname`, `task`, `date`) VALUES ({telegram_id[0][0]},'{data['nickname']}','{data['task']}', '{date_new_task_admin.get(call.from_user.id)[0]}-{date_new_task_admin.get(call.from_user.id)[1] + 1}-{date_new_task_admin.get(call.from_user.id)[2]}')")
         date_new_task_admin.pop(call.from_user.id)
 

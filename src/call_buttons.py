@@ -45,35 +45,6 @@ async def menu_handler(call: types.CallbackQuery):
         await call.message.answer('Меню', reply_markup = menu_kb)
 
 
-async def new_task_me(call: types.CallbackQuery):
-
-    await delete_call_messages(call)
-
-    current_datetime = datetime.now()
-
-    date_new_task_user[call.from_user.id] = [current_datetime.year, current_datetime.month]
-
-    await call.message.answer("Выбери дату на которую хочешь создать задание", reply_markup = calendar_kb(date_new_task_user.get(call.from_user.id)[0], date_new_task_user.get(call.from_user.id)[1]))
-
-
-async def new_task_me_button(call: types.CallbackQuery):
-
-    await delete_call_messages(call)
-
-    if (call.data == 'next'):
-        if (date_new_task_user.get(call.from_user.id)[1] == 12): date_new_task_user[call.from_user.id] = [date_new_task_user.get(call.from_user.id)[0] + 1, 0]
-
-        date_new_task_user[call.from_user.id] = [date_new_task_user.get(call.from_user.id)[0], date_new_task_user.get(call.from_user.id)[1] + 1]
-    
-    elif (call.data == 'back'):
-        if (date_new_task_user.get(call.from_user.id)[1] == 1): date_new_task_user[call.from_user.id] = [date_new_task_user.get(call.from_user.id)[0] - 1, 13]
-
-        date_new_task_user[call.from_user.id] = [date_new_task_user.get(call.from_user.id)[0], date_new_task_user.get(call.from_user.id)[1] - 1]
-
-    await call.message.answer("Выбери дату на которую хочешь создать задание", reply_markup = calendar_kb(date_new_task_user.get(call.from_user.id)[0], date_new_task_user.get(call.from_user.id)[1]))
-
 def register_handlers_call_buttons(dp: Dispatcher):
     dp.register_callback_query_handler(tasks_today, lambda call: call.data == 'tasks_today', state = '*')
     dp.register_callback_query_handler(menu_handler, lambda call: call.data == 'menu', state = '*')
-    dp.register_callback_query_handler(new_task_me, lambda call: call.data == 'new_task_me', state = '*')
-    dp.register_callback_query_handler(new_task_me_button, lambda call: call.data in button_calendar_arr, state = '*')
