@@ -2,7 +2,7 @@ from aiogram import Dispatcher, types
 from datetime import datetime
 
 from .CLASS.DataBase import DataBase
-from .keyboards import calendar_kb, button_calendar_arr
+from .keyboards import calendar_kb, button_calendar_arr, menu_kb, register_kb
 from .config import date_new_task_user
 from .functions import delete_call_messages 
 
@@ -27,6 +27,22 @@ async def tasks_today(call: types.CallbackQuery):
     tasks = res.split(', ')
 
     await call.message.answer(f"<b>Задачи на сегодня</b> \n\n" + '\n'.join(str(value) for value in tasks))
+
+
+async def menu_handler(call: types.CallbackQuery):
+
+    await delete_call_messages(call)
+
+    telegram_id = call.from_user.id
+
+    DB = DataBase()
+    res = DB.SQL(f"SELECT telegram_id FROM users WHERE telegram_id = {telegram_id}")
+
+    if (len(res) == 0):
+        await call.message.answer('Ты ещё не зарегистрировался', reply_markup = register_kb)
+
+    else:
+        await call.message.answer('Меню', reply_markup = menu_kb)
 
 
 async def new_task_me(call: types.CallbackQuery):
@@ -58,5 +74,6 @@ async def new_task_me_button(call: types.CallbackQuery):
 
 def register_handlers_call_buttons(dp: Dispatcher):
     dp.register_callback_query_handler(tasks_today, lambda call: call.data == 'tasks_today', state = '*')
+    dp.register_callback_query_handler(menu_handler, lambda call: call.data == 'menu', state = '*')
     dp.register_callback_query_handler(new_task_me, lambda call: call.data == 'new_task_me', state = '*')
     dp.register_callback_query_handler(new_task_me_button, lambda call: call.data in button_calendar_arr, state = '*')
