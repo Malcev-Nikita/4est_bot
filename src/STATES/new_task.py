@@ -4,7 +4,7 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 from datetime import datetime
 
 from ..CLASS.DataBase import DataBase
-from ..keyboards import users_kb, confirmation_kb, admin_kb, task_type_kb, task_type_arr
+from ..keyboards import users_kb, confirmation_kb, admin_kb, task_type_kb
 from ..functions import delete_messages, delete_call_messages
 from ..keyboards import calendar_kb
 from ..config import date_new_task_admin

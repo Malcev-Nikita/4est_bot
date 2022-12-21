@@ -2,8 +2,8 @@ from aiogram import Dispatcher, types
 from datetime import datetime
 
 from .CLASS.DataBase import DataBase
-from .keyboards import calendar_kb, button_calendar_arr, menu_kb, register_kb
-from .config import date_new_task_user
+from .keyboards import menu_kb, register_kb
+from .config import date_everyday_task
 from .functions import delete_call_messages 
 
 async def tasks_today(call: types.CallbackQuery):
@@ -17,12 +17,16 @@ async def tasks_today(call: types.CallbackQuery):
 
     DB = DataBase()
     res1 = DB.SQL(f"SELECT `everyday_tasks` FROM `users` WHERE `telegram_id` = {call.from_user.id}")
-    res2 = DB.SQL(f"SELECT `task` FROM `tasks` WHERE `telegram_id` = {call.from_user.id} AND `date` = '{formated_date}' AND `performed` = false")
+    res2 = DB.SQL(f"SELECT `task`, `performed` FROM `tasks` WHERE `telegram_id` = {call.from_user.id} AND `date` = '{formated_date}'")
 
     res = res1[0][0]
-    
+    performed = ''
+
     for task in res2:
-        res += ', ' + task[0]
+        if task[1]: performed = '✅'
+        else: performed = '🚫'
+        
+        res += ', ' + performed + ' ' + task[0]
 
     tasks = res.split(', ')
 
