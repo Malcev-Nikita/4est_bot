@@ -13,8 +13,3 @@ HOST = 'localhost'
 USER = 'root'
 PASSWD = ''
 DB = '4est_duty_bot'
-
-date_new_task_user = {}
-date_new_task_admin = {}
-
-date_everyday_task = {}

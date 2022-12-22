@@ -2,35 +2,47 @@ from aiogram import Dispatcher, types
 from datetime import datetime
 
 from .CLASS.DataBase import DataBase
-from .keyboards import menu_kb, register_kb
-from .config import date_everyday_task
+from .keyboards import menu_kb, register_kb, task_kb
 from .functions import delete_call_messages 
+from .config import bot
 
 async def tasks_today(call: types.CallbackQuery):
 
     await delete_call_messages(call)
+    DB = DataBase()
 
     now = datetime.now()
     formated_date = now.strftime('%Y-%m-%d')
 
-    tasks = []
+    nickname = DB.SQL(f"SELECT `nickname` FROM `users` WHERE `telegram_id` = {call.from_user.id}")
+    report = DB.SQL(f"SELECT `date`, `nickname`, `tasks` FROM `report` WHERE `date` = '{formated_date}'")
 
-    DB = DataBase()
-    res1 = DB.SQL(f"SELECT `everyday_tasks` FROM `users` WHERE `telegram_id` = {call.from_user.id}")
-    res2 = DB.SQL(f"SELECT `task`, `performed` FROM `tasks` WHERE `telegram_id` = {call.from_user.id} AND `date` = '{formated_date}'")
+    if (len(report) != 0 and report[0][1] != nickname[0][0]):
+        await call.message.answer("Сегодня уже смена открыта")
 
-    res = res1[0][0]
-    performed = ''
+    else:
+        tasks = []
 
-    for task in res2:
-        if task[1]: performed = '✅'
-        else: performed = '🚫'
-        
-        res += ', ' + performed + ' ' + task[0]
+        res = DB.SQL(f"SELECT `everyday_tasks`, `nickname` FROM `users` WHERE `telegram_id` = {call.from_user.id}")
 
-    tasks = res.split(', ')
+        if (len(DB.SQL(f"SELECT * FROM `report` WHERE `date` = '{formated_date}' AND `nickname` = '{res[0][1]}'")) == 0):
 
-    await call.message.answer(f"<b>Задачи на сегодня</b> \n\n" + '\n'.join(str(value) for value in tasks))
+            await call.message.answer("Смена открыта")
+
+            DB.SQL(f"INSERT INTO `report`(`date`, `nickname`, `tasks`) VALUES ('{formated_date}','{res[0][1]}', '{nickname[0][0]} - Открыл смену в {now.hour}:{now.minute}')")
+
+            admins = DB.SQL(f"SELECT `telegram_id` FROM `users` WHERE `role` = 'admin'")
+            
+            for admin in admins:
+                await bot.send_message(admin[0], f"{nickname[0][0]} - Открыл смену в {now.hour}:{now.minute}")
+
+
+        tasks_str = res[0][0]
+
+        tasks = tasks_str.split(', ')
+
+        for task in tasks:
+            await call.message.answer(f"🚫 {task}", reply_markup = task_kb)
 
 
 async def menu_handler(call: types.CallbackQuery):
