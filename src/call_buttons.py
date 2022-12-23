@@ -23,7 +23,7 @@ async def tasks_today(call: types.CallbackQuery):
     else:
         tasks = []
 
-        res = DB.SQL(f"SELECT `everyday_tasks`, `nickname` FROM `users` WHERE `telegram_id` = {call.from_user.id}")
+        res = DB.SQL(f"SELECT `everyday_tasks`, `nickname`, `time` FROM `users` WHERE `telegram_id` = {call.from_user.id}")
 
         if (len(DB.SQL(f"SELECT * FROM `report` WHERE `date` = '{formated_date}' AND `nickname` = '{res[0][1]}'")) == 0):
 
@@ -38,11 +38,19 @@ async def tasks_today(call: types.CallbackQuery):
 
 
         tasks_str = res[0][0]
+        times_str = res[0][2]
 
         tasks = tasks_str.split(', ')
+        times = times_str.split(', ')
+        time = ""
+        i = 0
 
-        for task in tasks:
-            await call.message.answer(f"🚫 {task}", reply_markup = task_kb)
+        while i < len(tasks):
+            if (times[i] == '1'): time = "весь день"
+            else: time = times[i]
+
+            await call.message.answer(f"🚫 {tasks[i]} - {time}", reply_markup = task_kb)
+            i += 1
 
 
 async def menu_handler(call: types.CallbackQuery):
@@ -61,6 +69,21 @@ async def menu_handler(call: types.CallbackQuery):
         await call.message.answer('Меню', reply_markup = menu_kb)
 
 
+async def confirm_task(call: types.CallbackQuery):
+
+    await call.message.delete()
+
+    DB = DataBase()
+    admins = DB.SQL(f"SELECT `telegram_id` FROM `users` WHERE `role` = 'admin'")
+    nickname = DB.SQL(f"SELECT `nickname` FROM `users` WHERE `telegram_id` = {call.from_user.id}")
+
+    now = datetime.now()
+            
+    for admin in admins:
+        await bot.send_message(admin[0], f"{nickname[0][0]} - Сделал ... <b>{call.message.text[2:]}</b> ... в {now.hour}:{now.minute}")
+
+
 def register_handlers_call_buttons(dp: Dispatcher):
     dp.register_callback_query_handler(tasks_today, lambda call: call.data == 'tasks_today', state = '*')
     dp.register_callback_query_handler(menu_handler, lambda call: call.data == 'menu', state = '*')
+    dp.register_callback_query_handler(confirm_task, lambda call: call.data == 'confirm', state = '*')
