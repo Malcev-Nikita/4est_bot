@@ -9,7 +9,7 @@ STORAGE = MemoryStorage()
 bot = Bot(token=TOKEN, parse_mode = types.ParseMode.HTML)
 dp = Dispatcher(bot, storage=STORAGE)
 
-HOST = 'localhost'
-USER = 'root'
-PASSWD = ''
-DB = '4est_duty_bot'
+HOST = '92.53.105.154'
+USER = 'gen_user'
+PASSWD = '3w2S6xi3fTVZnRR'
+DB = 'default_db'
