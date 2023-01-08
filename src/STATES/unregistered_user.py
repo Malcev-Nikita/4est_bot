@@ -16,7 +16,7 @@ async def start_register(call: types.CallbackQuery, state: FSMContext):
 
     await delete_call_messages(call)
 
-    await call.message.answer("<b>Введи своё имя.</b> \n\nЭто имя будет отображаться админам бота!", parse_mode = "MarkdownV2")
+    await call.message.answer("<b>Введи своё имя.</b> \n\nЭто имя будет отображаться админам бота!")
 
     await state.set_state(unregistered_user.nickname.state)
 
@@ -29,7 +29,7 @@ async def nickname(message: types.Message, state: FSMContext):
 
     await state.set_state(unregistered_user.role.state)
 
-    await message.answer("<b>Отлично!</b> Я запомнил твоё имя. \n\nТеперь выбери кто ты", reply_markup = role_kb, parse_mode = "MarkdownV2")
+    await message.answer("<b>Отлично!</b> Я запомнил твоё имя. \n\nТеперь выбери кто ты", reply_markup = role_kb)
 
 
 async def role(call: types.CallbackQuery, state: FSMContext):
