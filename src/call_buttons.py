@@ -71,11 +71,11 @@ async def menu_handler(call: types.CallbackQuery):
 
 async def confirm_task(call: types.CallbackQuery):
 
-    await call.message.delete()
-
     DB = DataBase()
     admins = DB.SQL(f"SELECT `telegram_id` FROM `users` WHERE `role` = 'admin'")
     nickname = DB.SQL(f"SELECT `nickname` FROM `users` WHERE `telegram_id` = {call.from_user.id}")
+
+    await call.message.delete()
 
     now = datetime.now()
             
