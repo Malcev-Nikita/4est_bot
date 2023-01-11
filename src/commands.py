@@ -1,5 +1,6 @@
 from aiogram import Dispatcher, types
 from aiogram.dispatcher import FSMContext
+from datetime import datetime
 
 from .CLASS.DataBase import DataBase
 from .keyboards import register_kb, menu_kb, role_kb
@@ -51,10 +52,17 @@ async def exit_handler(message: types.Message, state: FSMContext):
 
     await state.reset_state()
 
-    DB = DataBase()
-    DB.SQL(f"UPDATE `users` SET `role`='exit' `everyday_tasks` = '' WHERE `telegram_id` = {message.from_user.id}")
+    now = datetime.now()
+    formated_date = now.strftime('%Y-%m-%d')
 
-    await bot.answer_callback_query(callback_query_id = message.from_user.id, text="Ты вышел из системы. Ты всегда можешь вернуться, нажав на пункт в меню /menu", show_alert=True)
+    DB = DataBase()
+    DB.SQL(f"UPDATE `users` SET `role` = 'exit', `everyday_tasks` = '' WHERE `telegram_id` = {message.from_user.id}")
+
+    nickname = DB.SQL(f"SELECT `nickname` FROM `users` WHERE `telegram_id` = {message.from_user.id}")
+
+    DB.SQL(f"DELETE FROM `report` WHERE `date` = '{formated_date}' AND `nickname` = '{nickname[0][0]}'")
+
+    
 
 def commands_handler(dp: Dispatcher):
     dp.register_message_handler(start_handler, commands=['start'], state = '*')

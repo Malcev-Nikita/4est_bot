@@ -4,7 +4,7 @@ from datetime import datetime
 from .CLASS.DataBase import DataBase
 from .keyboards import menu_kb, register_kb, task_kb, complete_kb, role_arr
 from .functions import delete_call_messages 
-from .config import bot, master, admin
+from .config import bot, tattoo_master, administrator
 
 async def tasks_today(call: types.CallbackQuery):
 
@@ -16,49 +16,64 @@ async def tasks_today(call: types.CallbackQuery):
 
     nickname = DB.SQL(f"SELECT `nickname`, `role` FROM `users` WHERE `telegram_id` = {call.from_user.id}")
     report = DB.SQL(f"SELECT `date`, `nickname`, `tasks` FROM `report` WHERE `date` = '{formated_date}'")
-    # role_report = DB.SQL(f"SELECT `role` FROM `users` WHERE `nickname` = '{report[0][1]}'")
-    # and role_report[0][0] == nickname[0][1]
-    if (len(report) != 0 and report[0][1] != nickname[0][0] ):
-        await call.message.answer("Сегодня уже смена открыта")
+    
+    if (len(report) != 0 and report[0][1] != nickname[0][0]):
+        
+        role_report = DB.SQL(f"SELECT `role` FROM `users` WHERE `nickname` = '{report[0][1]}'")
+        if (role_report[0][0] == nickname[0][1]): 
+            await call.message.answer("Сегодня уже смена открыта")
 
+        else: await task_today_else(call, nickname)
+        
     else:
-        tasks = []
-
-        res = DB.SQL(f"SELECT `everyday_tasks`, `nickname` FROM `users` WHERE `telegram_id` = {call.from_user.id}")
-
-        if (len(DB.SQL(f"SELECT * FROM `report` WHERE `date` = '{formated_date}' AND `nickname` = '{res[0][1]}'")) == 0):
-
-            DB.SQL(f"INSERT INTO `report`(`date`, `nickname`, `tasks`) VALUES ('{formated_date}','{res[0][1]}', '{nickname[0][0]} - Открыл смену в {now.hour}:{now.minute}')")
-
-            admins = DB.SQL(f"SELECT `telegram_id` FROM `users` WHERE `role` = 'admin'")
-            
-            for admin in admins:
-                await bot.send_message(admin[0], f"{nickname[0][0]} - Открыл смену в {now.hour}:{now.minute}")
+        await task_today_else(call, nickname)
 
 
-        tasks_str = res[0][0]
+async def task_today_else(call: types.CallbackQuery, nickname):
 
-        tasks = tasks_str.split(', ')
-        i = 0
+    now = datetime.now()
+    formated_date = now.strftime('%Y-%m-%d')
 
-        await call.message.answer("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\n ✍️ <b>ЗАДАЧИ НА ДЕНЬ</b>\n- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -")
+    DB = DataBase()
 
-        while i < len(tasks):
+    tasks = []
 
-            if (nickname[0][1] == 'tattoo_master'):
-                if ('трансфера' in tasks[i]):
-                    await call.message.answer('- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\n ✍️ <b>ЗАДАЧИ НА СЕАНС ТАТУИРОВКИ</b>\n- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -')
-            
-            elif (nickname[0][1] == 'administrator'):
-                if ('акция эскизы' in tasks[i]):
-                    await call.message.answer('- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\n ✍️ <b>СТОРИС В ТЕЧЕНИИ ДНЯ</b>\n- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -')
+    res = DB.SQL(f"SELECT `everyday_tasks`, `nickname` FROM `users` WHERE `telegram_id` = {call.from_user.id}")
 
-                if ('чай или кофе' in tasks[i]):
-                    await call.message.answer('- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\n ✍️ <b>РАБОТА С КЛИЕНТОМ</b>\n- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -')
+    if (len(DB.SQL(f"SELECT * FROM `report` WHERE `date` = '{formated_date}' AND `nickname` = '{res[0][1]}'")) == 0):
 
-            await call.message.answer(f"❗️ {tasks[i]}", reply_markup = task_kb)
-            i += 1
+        DB.SQL(f"INSERT INTO `report`(`date`, `nickname`, `tasks`) VALUES ('{formated_date}','{res[0][1]}', '{nickname[0][0]} - Открыл смену в {now.hour}:{now.minute}')")
 
+        admins = DB.SQL(f"SELECT `telegram_id` FROM `users` WHERE `role` = 'admin'")
+        
+        for admin in admins:
+            await bot.send_message(admin[0], f"{nickname[0][0]} - Открыл смену в {now.hour}:{now.minute}")
+
+
+    tasks_str = res[0][0]
+
+    tasks = tasks_str.split('; ')
+    i = 0
+
+    separator = '- ' * 35
+
+    await call.message.answer(f"{separator}\n ✍️ <b>ЗАДАЧИ НА ДЕНЬ</b>\n{separator}")
+
+    while i < len(tasks):
+
+        if (nickname[0][1] == 'tattoo_master'):
+            if ('Залей сторис, перевод трансфера, к себе в сторис, в инсту и вк (Попроси админа снять на твой телефон)' in tasks[i]):
+                await call.message.answer(f"{separator}\n ✍️ <b>ЗАДАЧИ НА СЕАНС ТАТУИРОВКИ</b>\n{separator}")
+        
+        elif (nickname[0][1] == 'administrator'):
+            if ('Сторис, акция, эскизы от мастера (инста и вк)' in tasks[i]):
+                await call.message.answer(f"{separator}\n ✍️ <b>СТОРИС В ТЕЧЕНИИ ДНЯ</b>\n{separator}")
+
+            if ('Предложить клиенту чай или кофе' in tasks[i]):
+                await call.message.answer(f"{separator}\n ✍️ <b>РАБОТА С КЛИЕНТОМ</b>\n{separator}")
+
+        await call.message.answer(f"❗️ {tasks[i]}", reply_markup = task_kb)
+        i += 1    
 
 async def menu_handler(call: types.CallbackQuery):
 
@@ -96,10 +111,19 @@ async def select_role(call: types.CallbackQuery):
     await delete_call_messages(call)
     
     tasks = ''
+    
+    if call.data == 'tattoo_master': 
+        tasks = tattoo_master[0]
 
-    if call.data == 'tattoo_master': tasks = master 
+        for task in tattoo_master:
+            tasks += '; ' + task
 
-    elif call.data == 'administrator': tasks = admin
+
+    elif call.data == 'administrator': 
+        tasks = administrator[0]
+
+        for task in administrator:
+            tasks += '; ' + task
 
     DB = DataBase()
     DB.SQL(f"UPDATE `users` SET `role`='{call.data}',`everyday_tasks`='{tasks}' WHERE `telegram_id` = {call.from_user.id}")
