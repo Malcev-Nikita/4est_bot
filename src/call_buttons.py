@@ -2,7 +2,7 @@ from aiogram import Dispatcher, types
 from datetime import datetime
 
 from .CLASS.DataBase import DataBase
-from .keyboards import menu_kb, register_kb, task_kb
+from .keyboards import menu_kb, register_kb, task_kb, complete_kb
 from .functions import delete_call_messages 
 from .config import bot
 
@@ -49,7 +49,7 @@ async def tasks_today(call: types.CallbackQuery):
             if (times[i] == '1'): time = "весь день"
             else: time = times[i]
 
-            await call.message.answer(f"🚫 {tasks[i]} - {time}", reply_markup = task_kb)
+            await call.message.answer(f"❗️ {tasks[i]} - {time}", reply_markup = task_kb)
             i += 1
 
 
@@ -71,13 +71,15 @@ async def menu_handler(call: types.CallbackQuery):
 
 async def confirm_task(call: types.CallbackQuery):
 
+    await call.message.delete()
+
     DB = DataBase()
     admins = DB.SQL(f"SELECT `telegram_id` FROM `users` WHERE `role` = 'admin'")
     nickname = DB.SQL(f"SELECT `nickname` FROM `users` WHERE `telegram_id` = {call.from_user.id}")
 
-    await call.message.delete()
-
     now = datetime.now()
+
+    await call.message.answer('✅ ' + call.message.text[2:], reply_markup = complete_kb)
             
     for admin in admins:
         await bot.send_message(admin[0], f"{nickname[0][0]} - Сделал ... <b>{call.message.text[2:]}</b> ... в {now.hour}:{now.minute}")
