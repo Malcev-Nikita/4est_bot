@@ -2,9 +2,9 @@ from aiogram import Dispatcher, types
 from datetime import datetime
 
 from .CLASS.DataBase import DataBase
-from .keyboards import menu_kb, register_kb, task_kb, complete_kb
+from .keyboards import menu_kb, register_kb, task_kb, complete_kb, role_arr
 from .functions import delete_call_messages 
-from .config import bot
+from .config import bot, master, admin
 
 async def tasks_today(call: types.CallbackQuery):
 
@@ -14,10 +14,11 @@ async def tasks_today(call: types.CallbackQuery):
     now = datetime.now()
     formated_date = now.strftime('%Y-%m-%d')
 
-    nickname = DB.SQL(f"SELECT `nickname` FROM `users` WHERE `telegram_id` = {call.from_user.id}")
+    nickname = DB.SQL(f"SELECT `nickname`, `role` FROM `users` WHERE `telegram_id` = {call.from_user.id}")
     report = DB.SQL(f"SELECT `date`, `nickname`, `tasks` FROM `report` WHERE `date` = '{formated_date}'")
-
-    if (len(report) != 0 and report[0][1] != nickname[0][0]):
+    # role_report = DB.SQL(f"SELECT `role` FROM `users` WHERE `nickname` = '{report[0][1]}'")
+    # and role_report[0][0] == nickname[0][1]
+    if (len(report) != 0 and report[0][1] != nickname[0][0] ):
         await call.message.answer("Сегодня уже смена открыта")
 
     else:
@@ -43,8 +44,17 @@ async def tasks_today(call: types.CallbackQuery):
         await call.message.answer("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\n ✍️ <b>ЗАДАЧИ НА ДЕНЬ</b>\n- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -")
 
         while i < len(tasks):
-            if ('трансфера' in tasks[i]):
-                await call.message.answer('- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\n ✍️ <b>ЗАДАЧИ НА СЕАНС ТАТУИРОВКИ</b>\n- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -')
+
+            if (nickname[0][1] == 'tattoo_master'):
+                if ('трансфера' in tasks[i]):
+                    await call.message.answer('- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\n ✍️ <b>ЗАДАЧИ НА СЕАНС ТАТУИРОВКИ</b>\n- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -')
+            
+            elif (nickname[0][1] == 'administrator'):
+                if ('акция эскизы' in tasks[i]):
+                    await call.message.answer('- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\n ✍️ <b>СТОРИС В ТЕЧЕНИИ ДНЯ</b>\n- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -')
+
+                if ('чай или кофе' in tasks[i]):
+                    await call.message.answer('- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\n ✍️ <b>РАБОТА С КЛИЕНТОМ</b>\n- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -')
 
             await call.message.answer(f"❗️ {tasks[i]}", reply_markup = task_kb)
             i += 1
@@ -81,7 +91,22 @@ async def confirm_task(call: types.CallbackQuery):
         await bot.send_message(admin[0], f"{nickname[0][0]} - Сделал ... <b>{call.message.text[2:]}</b> ... в {now.hour}:{now.minute}")
 
 
+async def select_role(call: types.CallbackQuery):
+
+    await delete_call_messages(call)
+    
+    tasks = ''
+
+    if call.data == 'tattoo_master': tasks = master 
+
+    elif call.data == 'administrator': tasks = admin
+
+    DB = DataBase()
+    DB.SQL(f"UPDATE `users` SET `role`='{call.data}',`everyday_tasks`='{tasks}' WHERE `telegram_id` = {call.from_user.id}")
+
+
 def register_handlers_call_buttons(dp: Dispatcher):
     dp.register_callback_query_handler(tasks_today, lambda call: call.data == 'tasks_today', state = '*')
     dp.register_callback_query_handler(menu_handler, lambda call: call.data == 'menu', state = '*')
     dp.register_callback_query_handler(confirm_task, lambda call: call.data == 'confirm', state = '*')
+    dp.register_callback_query_handler(select_role, lambda call: call.data in role_arr)

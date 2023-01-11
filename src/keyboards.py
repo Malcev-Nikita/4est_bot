@@ -4,7 +4,7 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 ## Кнопки
 tattoo_master = InlineKeyboardButton('Тату мастер', callback_data='tattoo_master')
 administrator = InlineKeyboardButton('Администратор', callback_data='administrator')
-preadmin = InlineKeyboardButton('Запрос на админа', callback_data='preadmin')
+admin = InlineKeyboardButton('Хозяин', callback_data='admin')
 
 register = InlineKeyboardButton('Регистирация', callback_data = 'register')
 
@@ -15,7 +15,7 @@ confirm = InlineKeyboardButton('✅', callback_data = "confirm")
 complete = InlineKeyboardButton('Ты красава, задача выполнена, поехали дальше', callback_data = 'complete')
 
 ## Клавиатуры
-role_kb = InlineKeyboardMarkup(row_width = 3).add(tattoo_master, administrator, preadmin)
+role_kb = InlineKeyboardMarkup(row_width = 3).add(tattoo_master, administrator, admin)
 register_kb = InlineKeyboardMarkup().add(register)
 menu_kb = InlineKeyboardMarkup().add(tasks_today)
 task_kb = InlineKeyboardMarkup().add(confirm)
@@ -29,4 +29,4 @@ def users_kb(users: str) -> InlineKeyboardMarkup:
     return markup
 
 
-role_arr = ['tattoo_master', 'barber', 'administrator', 'preadmin']
+role_arr = ['tattoo_master', 'administrator', 'admin']

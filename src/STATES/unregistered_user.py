@@ -41,7 +41,6 @@ async def role(call: types.CallbackQuery, state: FSMContext):
     data = await state.get_data()
 
     tasks = ''
-    time = ''
     
     if call.data == 'tattoo_master': tasks = master 
 
