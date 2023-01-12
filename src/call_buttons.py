@@ -61,7 +61,7 @@ async def task_today_else(call: types.CallbackQuery, nickname):
     tasks = tasks_str.split('; ')
     i = 0
 
-    separator = '- ' * 35
+    separator = '- ' * 28
 
     await call.message.answer(f"{separator}\n ✍️ <b>ЗАДАЧИ НА ДЕНЬ</b>\n{separator}")
 
@@ -125,7 +125,7 @@ async def confirm_task(call: types.CallbackQuery):
     DB.SQL(f"INSERT INTO `report`(`date`, `nickname`, `role`, `tasks`) VALUES ('{formated_date}','{nickname[0][0]}','{nickname[0][1]}','{call.message.text[3:]}')")
 
     for admin in admins:
-        await bot.send_message(admin[0], f"{nickname[0][0]} - Сделал ... <b>{call.message.text[3:]}</b> ... в {now.hour}:{now.minute}")
+        await bot.send_message(admin[0], f"{nickname[0][0]} - ✅ Сделал ... <b>{call.message.text[3:]}</b> ... в {now.hour}:{now.minute}")
 
 
 async def select_role(call: types.CallbackQuery):
