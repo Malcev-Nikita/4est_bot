@@ -60,14 +60,32 @@ async def exit_handler(message: types.Message, state: FSMContext):
 
     nickname = DB.SQL(f"SELECT `nickname` FROM `users` WHERE `telegram_id` = {message.from_user.id}")
 
-    DB.SQL(f"DELETE FROM `report` WHERE `date` = '{formated_date}' AND `nickname` = '{nickname[0][0]}'")
+    DB.SQL(f"DELETE FROM `report` WHERE `date` = '{formated_date}' AND `nickname` = '{nickname[0][0]}' AND `tasks` LIKE '%Открыл смену%'")
 
+    await message.answer('Ты вышел из системы, теперь можешь выбрать другую роль', reply_markup = role_kb)
+
+
+async def close_handler(message: types.Message, state: FSMContext):
     
+    await delete_messages(message)
+
+    await state.reset_state()
+
+    now = datetime.now()
+    formated_date = now.strftime('%Y-%m-%d')
+
+    DB = DataBase()
+    nickname = DB.SQL(f"SELECT `nickname` FROM `users` WHERE `telegram_id` = {message.from_user.id}")
+    DB.SQL(f"DELETE FROM `report` WHERE `date` = '{formated_date}' AND `nickname` = '{nickname[0][0]}' AND `tasks` LIKE '%Открыл смену%'")
+
+    await message.answer('Ты закрыл смену')
 
 def commands_handler(dp: Dispatcher):
     dp.register_message_handler(start_handler, commands=['start'], state = '*')
     dp.register_message_handler(menu_handler, commands=['menu'], state = '*')
     dp.register_message_handler(exit_handler, commands=['exit'], state = '*')
+    dp.register_message_handler(close_handler, commands=['close'], state = '*')
 
-## start - Команда для того, чтобы начать диалог с ботом
-## menu - Команда для того, чтобы перейти в меню бота
+## menu - Открыть смену
+## close - Закрыть смену
+## exit - Выйти из системы

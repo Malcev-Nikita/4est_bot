@@ -15,7 +15,7 @@ confirm       = InlineKeyboardButton('✅', callback_data = "confirm")
 complete      = InlineKeyboardButton('Ты красава, задача выполнена, поехали дальше', callback_data = 'complete')
 
 ## Клавиатуры
-role_kb     = InlineKeyboardMarkup(row_width = 3).add(tattoo_master, administrator, admin)
+role_kb     = InlineKeyboardMarkup(row_width = 2).add(tattoo_master, administrator, admin)
 register_kb = InlineKeyboardMarkup().add(register)
 menu_kb     = InlineKeyboardMarkup().add(tasks_today)
 task_kb     = InlineKeyboardMarkup().add(confirm)
@@ -29,4 +29,4 @@ def users_kb(users: str) -> InlineKeyboardMarkup:
     return markup
 
 
-role_arr = ['tattoo_master', 'administrator', 'admin']
+role_arr = ['tattoo_master', 'administrator']

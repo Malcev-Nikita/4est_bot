@@ -30,6 +30,11 @@ async def nickname(message: types.Message, state: FSMContext):
 
     await state.set_state(unregistered_user.role.state)
 
+    data = await state.get_data()
+
+    DB = DataBase()
+    DB.SQL(f"INSERT INTO users (telegram_id, nickname, role) VALUES ({message.from_user.id}, '{data['nickname']}', 'exit')")
+
     await message.answer("<b>Отлично!</b> Я запомнил твоё имя. \n\nТеперь выбери кто ты", reply_markup = role_kb)
 
 
@@ -56,7 +61,7 @@ async def role(call: types.CallbackQuery, state: FSMContext):
             tasks += '; ' + task
 
     DB = DataBase()
-    DB.SQL(f"INSERT INTO users (telegram_id, nickname, role, everyday_tasks) VALUES ({call.from_user.id}, '{data['nickname']}', '{data['role']}', '{tasks}')")
+    DB.SQL(f"UPDATE `users` SET `role`='{data['role']}',`everyday_tasks`='{tasks}' WHERE `telegram_id` = {call.from_user.id}")
 
     await call.message.answer("<b>Отлично!</b> Ты зарегистрирован")
 
