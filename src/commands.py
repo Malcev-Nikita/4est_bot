@@ -5,7 +5,6 @@ from datetime import datetime
 from .CLASS.DataBase import DataBase
 from .keyboards import register_kb, menu_kb, role_kb
 from .functions import delete_messages 
-from .config import bot
 
 async def start_handler(message: types.Message, state: FSMContext):
 
@@ -88,4 +87,11 @@ def commands_handler(dp: Dispatcher):
 
 ## menu - Открыть смену
 ## close - Закрыть смену
-## exit - Выйти из системы
+## role - Сменить роль
+## exit - Обнулить бота
+
+## Добавить отправку админам уведомления про закрития смены
+## Сменить роль
+## Обнулить бота
+
+## Инстуркция в кнопке при старте

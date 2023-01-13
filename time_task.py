@@ -15,7 +15,7 @@ async def outstanding_tasks():
     now = datetime.now()
     formated_date = now.strftime('%Y-%m-%d')
 
-    separator = '- ' * 28
+    separator = '- ' * 22
 
     for role in role_arr:
         tasks = DB.SQL(f"SELECT `tasks` FROM `report` WHERE `date` = '{formated_date}' AND `role` = '{role}'")

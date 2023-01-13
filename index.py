@@ -20,3 +20,6 @@ register_handlers_admin_reg(dp)
 
 if __name__ == '__main__':
     executor.start_polling(dp)
+
+
+## Допилить отправку сообщения админам, о незавершённых задачах
