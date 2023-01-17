@@ -25,7 +25,7 @@ async def password(message: types.Message, state: FSMContext):
     await delete_messages(message)
 
     DB = DataBase()
-    DB.SQL(f"UPDATE `users` SET `role`='admin' WHERE `telegram_id` = {message.from_user.id}")
+    DB.SQL(f"UPDATE `users` SET `role`='admin', `everyday_tasks`='' WHERE `telegram_id` = {message.from_user.id}")
 
     await message.answer("<b>Отлично!</b> Тепрь ты Хозяин")
 

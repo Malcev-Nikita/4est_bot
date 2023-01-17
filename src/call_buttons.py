@@ -80,6 +80,3 @@ def register_handlers_call_buttons(dp: Dispatcher):
     dp.register_callback_query_handler(menu_handler, lambda call: call.data == 'menu', state = '*')
     dp.register_callback_query_handler(confirm_task, lambda call: call.data == 'confirm', state = '*')
     dp.register_callback_query_handler(select_role, lambda call: call.data in role_arr)
-
-
-## Добавить проверку на, то если задание выполнено, то не отправлять отчёт в бд и админам

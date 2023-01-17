@@ -1,14 +1,19 @@
-from aiogram import executor
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from datetime import datetime
 import asyncio
-import aioschedule
+from aiogram import executor
+import schedule
 from datetime import datetime
 
 from src.CLASS.DataBase import DataBase
 from src.config import bot, tattoo_master, administrator, dp
 from src.keyboards import role_arr
 
+scheduler = AsyncIOScheduler()
+
 
 async def outstanding_tasks():
+    print("Есть")
     DB = DataBase()
     admins = DB.SQL(f"SELECT `telegram_id` FROM `users` WHERE `role` = 'admin'")
 
@@ -18,29 +23,39 @@ async def outstanding_tasks():
     separator = '- ' * 22
 
     for role in role_arr:
-        tasks = DB.SQL(f"SELECT `tasks` FROM `report` WHERE `date` = '{formated_date}' AND `role` = '{role}'")
+        res = DB.SQL(f"SELECT `tasks` FROM `report` WHERE `date` = '{formated_date}' AND `role` = '{role}'")
+        
+        tasks = []
+        for task in res:
+            tasks.append(task[0])
+
+        tasks_str = '; '.join(tasks)
+        print(tasks_str)
 
         for admin in admins:
-            await bot.send_message(f"{separator}\n ✍️ <b>Тату мастер</b>\n{separator}")
+            if (role == 'tattoo_master'):
+                await bot.send_message(admin[0], f"{separator}\n ✍️ <b>Тату мастер</b>\n{separator}")
 
-            for task in tasks: 
-                i = 1
                 for task_tattoo_master in tattoo_master:
-                    if (task[0] != task_tattoo_master and i == len(task_tattoo_master)):
+                    if (task_tattoo_master not in tasks_str):
                         await bot.send_message(admin[0], f"🚫 Тату мастер не сделал ... <b>{task[0]}</b>")
 
-                    i += 1
 
-async def scheduler():
-    aioschedule.every().day.at("1:16").do(outstanding_tasks)
-    while True:
-        await aioschedule.run_pending()
-        await asyncio.sleep(1)
-        
-async def on_startup(): 
-    await asyncio.create_task(scheduler())
+            elif (role == 'administrator'):
+                await bot.send_message(admin[0], f"{separator}\n ✍️ <b>Администратор</b>\n{separator}")
 
+                for task_administrator in administrator:
+                    if (task_administrator not in tasks_str):
+                        await bot.send_message(admin[0], f"🚫 Администратор не сделал ... <b>{task[0]}</b>")
+
+
+
+def schedule_jobs():
+    scheduler.add_job(outstanding_tasks, 'cron', hour = 23 - 1, minute = 35, timezone = "Europe/Moscow")
+
+async def on_sturtup(dp):
+    schedule_jobs()
 
 if __name__ == '__main__':
-    executor.start_polling(on_startup)
-
+    scheduler.start()
+    executor.start_polling(dp, on_startup = on_sturtup)
