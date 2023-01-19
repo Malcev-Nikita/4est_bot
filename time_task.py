@@ -13,7 +13,6 @@ scheduler = AsyncIOScheduler()
 
 
 async def outstanding_tasks():
-    print("Есть")
     DB = DataBase()
     admins = DB.SQL(f"SELECT `telegram_id` FROM `users` WHERE `role` = 'admin'")
 
@@ -30,7 +29,6 @@ async def outstanding_tasks():
             tasks.append(task[0])
 
         tasks_str = '; '.join(tasks)
-        print(tasks_str)
 
         for admin in admins:
             if (role == 'tattoo_master'):
@@ -38,7 +36,7 @@ async def outstanding_tasks():
 
                 for task_tattoo_master in tattoo_master:
                     if (task_tattoo_master not in tasks_str):
-                        await bot.send_message(admin[0], f"🚫 Тату мастер не сделал ... <b>{task[0]}</b>")
+                        await bot.send_message(admin[0], f"🚫 Тату мастер не сделал ... <b>{task_tattoo_master}</b>")
 
 
             elif (role == 'administrator'):
@@ -46,12 +44,12 @@ async def outstanding_tasks():
 
                 for task_administrator in administrator:
                     if (task_administrator not in tasks_str):
-                        await bot.send_message(admin[0], f"🚫 Администратор не сделал ... <b>{task[0]}</b>")
+                        await bot.send_message(admin[0], f"🚫 Администратор не сделал ... <b>{task_administrator}</b>")
 
 
 
 def schedule_jobs():
-    scheduler.add_job(outstanding_tasks, 'cron', hour = 23 - 1, minute = 35, timezone = "Europe/Moscow")
+    scheduler.add_job(outstanding_tasks, 'cron', hour = 21 - 1, minute = 0, timezone = "Europe/Moscow")
 
 async def on_sturtup(dp):
     schedule_jobs()
