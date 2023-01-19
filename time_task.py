@@ -1,8 +1,6 @@
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from datetime import datetime
-import asyncio
 from aiogram import executor
-import schedule
 from datetime import datetime
 
 from src.CLASS.DataBase import DataBase
@@ -53,7 +51,3 @@ def schedule_jobs():
 
 async def on_sturtup(dp):
     schedule_jobs()
-
-if __name__ == '__main__':
-    scheduler.start()
-    executor.start_polling(dp, on_startup = on_sturtup)
