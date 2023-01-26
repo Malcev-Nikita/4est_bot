@@ -1,5 +1,4 @@
 from aiogram import executor
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
 import logging
 
 from src.config import dp
