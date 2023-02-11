@@ -2,7 +2,9 @@ from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram import Bot, Dispatcher, types
 
 
-TOKEN         = "5986825673:AAEVQNsig6A-QsMjZj_piIQ_n60M3Mc8yh0"
+
+# TOKEN         = "6167962615:AAE89WBo_c3ewtw0n2hpHrs8UA9QbYaa2Wg"
+# TOKEN         = "5986825673:AAEVQNsig6A-QsMjZj_piIQ_n60M3Mc8yh0"
 STORAGE       = MemoryStorage()
 
 bot           = Bot(token=TOKEN, parse_mode = types.ParseMode.HTML)
@@ -29,6 +31,12 @@ tattoo_master = [ 'Найди 4 подборки с эскизами в инте
                   'Скинь фото с клиентом админу',
                   'Попроси клиента выложить у себя сторис с отметкой Честь клуба',
                   'Попроси клиента оставить отзыв 2gis, Google, Яндекс (Где удобно)' ]
+
+tattoo_master_everyday = [ 'Фото с собой и приветствие (вк, инст, вотс)',
+                           'Акция (эскиз, пинтерест и т.д.) без слова акция и скидка (вк, инст, вотс)',
+                           'Твоё тату (фото, видео) (вк, инст, вотс)',
+                           'Рассылка Инст - 20шт, Вк - 15шт',
+                           'Пост со своей тату (вк, инст, вотс)' ]
 
 administrator = [ 'Вытащить штендер на улицу',
                   'Уборка (Протереть пыль на холодильнике, полках, обувнице, диване и т.д. Помыть пол в тату зоне и в зоне дивана)',
