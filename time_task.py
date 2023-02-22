@@ -2,7 +2,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from datetime import datetime, timedelta
 
 from src.CLASS.DataBase import DataBase
-from src.config import bot, tattoo_master, administrator, dp
+from src.config import bot
 from src.keyboards import role_arr
 
 scheduler = AsyncIOScheduler()
@@ -22,6 +22,7 @@ async def admin_message_tasks():
 
     for role in role_arr:
         res = DB.SQL(f"SELECT `tasks` FROM `report` WHERE `date` = '{formated_date}' AND `role` = '{role}'")
+        tasks_sql = DB.SQL(f"SELECT * FROM `{role}_tasks`")
         
         tasks = []
         for task in res:
@@ -33,16 +34,16 @@ async def admin_message_tasks():
             if (role == 'tattoo_master'):
                 await bot.send_message(admin[0], f"{separator}\n ✍️ <b>Тату мастер</b>\n{separator}")
 
-                for task_tattoo_master in tattoo_master:
-                    if (task_tattoo_master not in tasks_str):
+                for task_tattoo_master in tasks_sql:
+                    if (task_tattoo_master[2] not in tasks_str):
                         await bot.send_message(admin[0], f"🚫 Тату мастер не сделал ... <b>{task_tattoo_master}</b>")
 
 
             elif (role == 'administrator'):
                 await bot.send_message(admin[0], f"{separator}\n ✍️ <b>Администратор</b>\n{separator}")
 
-                for task_administrator in administrator:
-                    if (task_administrator not in tasks_str):
+                for task_administrator in tasks_sql:
+                    if (task_administrator[2] not in tasks_str):
                         await bot.send_message(admin[0], f"🚫 Администратор не сделал ... <b>{task_administrator}</b>")
 
     DB.SQL(f"DELETE FROM `report` WHERE `date` = '{formated_yesterday}'")
@@ -56,11 +57,13 @@ async def reminder():
     shifts = DB.SQL(f"SELECT `nickname`, `role` FROM `report` WHERE `date` = '{formated_date}' AND `tasks` LIKE '%Открыл смену%'")
 
     for shift in shifts:
+        tasks_sql = DB.SQL(f"SELECT * FROM `{shift[1]}_tasks`")
+
         telegram_id = DB.SQL(f"SELECT `telegram_id` FROM `users` WHERE `nickname` = '{shift[0]}'")
 
         count_tasks = DB.SQL(f"SELECT COUNT(*) FROM `report` WHERE `tasks` NOT LIKE '%Открыл смену%' AND `role` = '{shift[1]}' AND `date` = '{formated_date}'")
 
-        if ((shift[1] == 'administrator' and count_tasks[0][0] < len(administrator)) or (shift[1] == 'tattoo_master' and count_tasks[0][0] < len(tattoo_master))):
+        if ((shift[1] == 'administrator' and count_tasks[0][0] < len(tasks_sql)) or (shift[1] == 'tattoo_master' and count_tasks[0][0] < len(tasks_sql))):
             await bot.send_message(telegram_id[0][0], f"У тебя ещё есть не выполненные задачи")
 
 

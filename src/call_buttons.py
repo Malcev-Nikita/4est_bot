@@ -2,9 +2,9 @@ from aiogram import Dispatcher, types
 from datetime import datetime
 
 from .CLASS.DataBase import DataBase
-from .keyboards import menu_kb, register_kb, complete_kb, role_arr
+from .keyboards import menu_kb, register_kb, complete_kb, no_complete_kb, role_arr
 from .functions import delete_call_messages 
-from .config import bot, tattoo_master, administrator
+from .config import bot
 
 
 async def menu_handler(call: types.CallbackQuery):
@@ -31,16 +31,18 @@ async def confirm_task(call: types.CallbackQuery):
 
     now = datetime.now()
     formated_date = now.strftime('%Y-%m-%d')
-    
-    await call.answer(cache_time=2)
-    await call.message.edit_text(f'✅ {call.message.text[2:]}', reply_markup = complete_kb)
 
     DB.SQL(f"INSERT INTO `report`(`date`, `nickname`, `role`, `tasks`) VALUES ('{formated_date}','{nickname[0][0]}','{nickname[0][1]}','{call.message.text[3:]}')")
 
     if call.data == 'confirm':
+        await call.answer(cache_time=2)
+        await call.message.edit_text(f'✅ {call.message.text[2:]}', reply_markup = complete_kb)
+
         for admin in admins:
             await bot.send_message(admin[0], f"{nickname[0][0]} - ✅ Сделал ... <b>{call.message.text[3:]}</b> ... в {now.hour}:{now.minute}")
-
+    else: 
+        await call.answer(cache_time=2)
+        await call.message.edit_text(f'☺️ {call.message.text[2:]}', reply_markup = no_complete_kb)
 
 async def select_role(call: types.CallbackQuery):
 
@@ -59,7 +61,7 @@ async def select_role(call: types.CallbackQuery):
 
     tasks = tasks[:-2]
     
-    DB.SQL(f"UPDATE `users` SET `role`='{call.data}',`everyday_tasks`='{tasks}' WHERE `telegram_id` = {call.from_user.id}")
+    DB.SQL(f"UPDATE `users` SET `role`='{call.data}' WHERE `telegram_id` = {call.from_user.id}")
 
     nickname = DB.SQL(f"SELECT `nickname` FROM `users` WHERE `telegram_id` = {call.from_user.id}")
 

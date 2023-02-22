@@ -5,7 +5,6 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 from ..CLASS.DataBase import DataBase
 from ..keyboards import role_kb, role_arr
 from ..functions import delete_messages, delete_call_messages
-from ..config import tattoo_master, administrator
 
 
 class unregistered_user(StatesGroup):
@@ -45,23 +44,8 @@ async def role(call: types.CallbackQuery, state: FSMContext):
     await state.update_data(role = call.data)
     data = await state.get_data()
 
-    tasks = ''
-    
-    if call.data == 'tattoo_master': 
-        tasks = tattoo_master[0]
-
-        for task in tattoo_master:
-            tasks += '; ' + task
-
-
-    elif call.data == 'administrator': 
-        tasks = administrator[0]
-
-        for task in administrator:
-            tasks += '; ' + task
-
     DB = DataBase()
-    DB.SQL(f"UPDATE `users` SET `role`='{data['role']}',`everyday_tasks`='{tasks}' WHERE `telegram_id` = {call.from_user.id}")
+    DB.SQL(f"UPDATE `users` SET `role`='{data['role']}' WHERE `telegram_id` = {call.from_user.id}")
 
     await call.message.answer("<b>Отлично!</b> Ты зарегистрирован")
 

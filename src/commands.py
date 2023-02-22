@@ -3,7 +3,7 @@ from aiogram.dispatcher import FSMContext
 from datetime import datetime
 
 from .CLASS.DataBase import DataBase
-from .keyboards import register_kb, role_kb, role_arr, task_kb, complete_kb
+from .keyboards import register_kb, role_kb, role_arr, task_kb, task_bool_kb, complete_kb
 from .functions import delete_messages 
 from .config import bot
 
@@ -56,51 +56,41 @@ async def task_today_else(message: types.Message, nickname):
 
     DB = DataBase()
 
-    res = DB.SQL(f"SELECT `everyday_tasks`, `nickname`, `role` FROM `users` WHERE `telegram_id` = {message.from_user.id}")
-    tasks_completely = DB.SQL(f"SELECT `tasks` FROM `report` WHERE `date` = '{formated_date}' AND `role` = '{res[0][2]}'")
+    res = DB.SQL(f"SELECT `nickname`, `role` FROM `users` WHERE `telegram_id` = {message.from_user.id}")
+    tasks_sql = DB.SQL(f"SELECT * FROM `{res[0][1]}_tasks`")
+    tasks_completely = DB.SQL(f"SELECT `tasks` FROM `report` WHERE `date` = '{formated_date}' AND `role` = '{res[0][1]}'")
 
-    if (len(DB.SQL(f"SELECT * FROM `report` WHERE `date` = '{formated_date}' AND `nickname` = '{res[0][1]}'")) == 0):
+    if (len(DB.SQL(f"SELECT * FROM `report` WHERE `date` = '{formated_date}' AND `nickname` = '{res[0][0]}'")) == 0):
 
-        DB.SQL(f"INSERT INTO `report`(`date`, `nickname`, `role`, `tasks`) VALUES ('{formated_date}','{res[0][1]}', '{nickname[0][1]}','{nickname[0][0]} - Открыл смену в {now.hour}:{now.minute}')")
+        DB.SQL(f"INSERT INTO `report`(`date`, `nickname`, `role`, `tasks`) VALUES ('{formated_date}','{res[0][0]}', '{nickname[0][1]}','{nickname[0][0]} - Открыл смену в {now.hour}:{now.minute}')")
 
         admins = DB.SQL(f"SELECT `telegram_id` FROM `users` WHERE `role` = 'admin'")
         
         for admin in admins:
             await bot.send_message(admin[0], f"{nickname[0][0]} - 🚪 Открыл смену в {now.hour}:{now.minute}")
 
-
-    tasks = []
-    tasks = res[0][0].split('; ')
-    i = 0
+    keyboard = task_kb
 
     separator = '- ' * 22
-
-    await message.answer(f"{separator}\n ✍️ <b>ЗАДАЧИ НА ДЕНЬ</b>\n{separator}")
-
-    while i < len(tasks):
-
+    i = 0
+    while i < len(tasks_sql):
         done = False
 
-        if ('Залей сторис, перевод трансфера, к себе в сторис, в инсту и вк (Попроси админа снять на твой телефон)' == tasks[i]):
-            await message.answer(f"{separator}\n ✍️ <b>ЗАДАЧИ НА СЕАНС ТАТУИРОВКИ</b>\n{separator}")
-    
-        if ('Сторис, акция, эскизы от мастера (инста и вк)' == tasks[i]):
-            await message.answer(f"{separator}\n ✍️ <b>СТОРИС В ТЕЧЕНИИ ДНЯ</b>\n{separator}")
+        if (tasks_sql[i][0] == 0 or tasks_sql[i][1] != tasks_sql[i - 1][1]):
+            await message.answer(f"{separator}\n ✍️ <b>{tasks_sql[i][1]}</b>\n{separator}")
 
-        if ('Предложить клиенту чай или кофе' == tasks[i]):
-            await message.answer(f"{separator}\n ✍️ <b>РАБОТА С КЛИЕНТОМ</b>\n{separator}")
-
-        
         for task_completely in tasks_completely:
-            if (task_completely[0] == tasks[i]): 
+            if (task_completely[0] == tasks_sql[i][1]): 
                 done = True
                 break
+        
+        if (tasks_sql[i][3] == 'bool'): keyboard = task_bool_kb
 
-        if (done): await message.answer(f'✅ {tasks[i]}', reply_markup = complete_kb)
+        if (done): await message.answer(f'✅ {tasks_sql[i][1]}', reply_markup = complete_kb)
 
-        else: await message.answer(f"❗️ {tasks[i]}", reply_markup = task_kb)
+        else: await message.answer(f"❗️ {tasks_sql[i][2]}", reply_markup = keyboard)
 
-        i += 1  
+        i += 1
 
 
 async def role_handler(message: types.Message, state: FSMContext):
