@@ -11,6 +11,7 @@ register      = InlineKeyboardButton('Регистирация', callback_data =
 tasks_today   = InlineKeyboardButton('Задачи на сегодня', callback_data = 'tasks_today')
 
 confirm       = InlineKeyboardButton('✅', callback_data = "confirm")
+no_client     = InlineKeyboardButton('😢 Сегодня нет клиента', callback_data = "no_confirm")
 
 complete      = InlineKeyboardButton('Ты красава, задача выполнена, поехали дальше', callback_data = 'complete')
 

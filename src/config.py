@@ -3,8 +3,9 @@ from aiogram import Bot, Dispatcher, types
 
 
 
-# TOKEN         = "6167962615:AAE89WBo_c3ewtw0n2hpHrs8UA9QbYaa2Wg"
-# TOKEN         = "5986825673:AAEVQNsig6A-QsMjZj_piIQ_n60M3Mc8yh0"
+TOKEN         = "6167962615:AAE89WBo_c3ewtw0n2hpHrs8UA9QbYaa2Wg" # Тест
+# TOKEN         = "5986825673:AAEVQNsig6A-QsMjZj_piIQ_n60M3Mc8yh0" # Не тест
+
 STORAGE       = MemoryStorage()
 
 bot           = Bot(token=TOKEN, parse_mode = types.ParseMode.HTML)
@@ -77,5 +78,8 @@ administrator = [ 'Вытащить штендер на улицу',
                   'Добавить контакты с опросника на рабочий телефон и амо срм',
                   'Поставить напоминалку в amoCRM (через две недели узнать про заживление)',
                   'Отправить благодарственное сообщение клиентам после сеанса. (текс сообщения в заметках рабочего телефона)' ]
+
+# standart
+# bool
 
 code_admin    = 'Честь'

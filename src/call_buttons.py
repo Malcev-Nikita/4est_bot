@@ -37,36 +37,28 @@ async def confirm_task(call: types.CallbackQuery):
 
     DB.SQL(f"INSERT INTO `report`(`date`, `nickname`, `role`, `tasks`) VALUES ('{formated_date}','{nickname[0][0]}','{nickname[0][1]}','{call.message.text[3:]}')")
 
-    for admin in admins:
-        await bot.send_message(admin[0], f"{nickname[0][0]} - ✅ Сделал ... <b>{call.message.text[3:]}</b> ... в {now.hour}:{now.minute}")
+    if call.data == 'confirm':
+        for admin in admins:
+            await bot.send_message(admin[0], f"{nickname[0][0]} - ✅ Сделал ... <b>{call.message.text[3:]}</b> ... в {now.hour}:{now.minute}")
 
 
 async def select_role(call: types.CallbackQuery):
 
     await delete_call_messages(call)
 
+    DB = DataBase()
+    tasks_sql = DB.SQL(f"SELECT `id`, `name`, `description`, `type` FROM `{call.data}_tasks`")
+
     now = datetime.now()
     formated_date = now.strftime('%Y-%m-%d')
     
     tasks = ''
-    i = 1
     
-    if call.data == 'tattoo_master': 
-        tasks = tattoo_master[0]
+    for task in tasks_sql:
+        tasks += task[2] + "; "
 
-        while (i < len(tattoo_master)):
-            tasks += '; ' + tattoo_master[i]
-            i += 1
-
-
-    elif call.data == 'administrator': 
-        tasks = administrator[0]
-
-        while (i < len(administrator)):
-            tasks += '; ' + administrator[i]
-            i += 1
-
-    DB = DataBase()
+    tasks = tasks[:-2]
+    
     DB.SQL(f"UPDATE `users` SET `role`='{call.data}',`everyday_tasks`='{tasks}' WHERE `telegram_id` = {call.from_user.id}")
 
     nickname = DB.SQL(f"SELECT `nickname` FROM `users` WHERE `telegram_id` = {call.from_user.id}")
@@ -78,5 +70,5 @@ async def select_role(call: types.CallbackQuery):
 
 def register_handlers_call_buttons(dp: Dispatcher):
     dp.register_callback_query_handler(menu_handler, lambda call: call.data == 'menu', state = '*')
-    dp.register_callback_query_handler(confirm_task, lambda call: call.data == 'confirm', state = '*')
+    dp.register_callback_query_handler(confirm_task, lambda call: call.data == 'confirm' or call.data == 'no_confirm', state = '*')
     dp.register_callback_query_handler(select_role, lambda call: call.data in role_arr)
