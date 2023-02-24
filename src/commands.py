@@ -127,11 +127,45 @@ async def close_handler(message: types.Message, state: FSMContext):
     else: 
         await message.answer('С твоей ролью нельзя закрыть смену')
 
+
+async def everyday_task_handler(message: types.Message, state: FSMContext):
+
+    await delete_messages(message)
+
+    await state.reset_state()
+
+    DB = DataBase()
+
+    res = DB.SQL(f"SELECT * FROM `tattoo_master_everyday_tasks`")
+
+    separator = '- ' * 22
+    i = 0
+    
+    while i < len(tasks_sql):
+        done = False
+
+        if (tasks_sql[i][0] == 0 or tasks_sql[i][1] != tasks_sql[i - 1][1]):
+            await message.answer(f"{separator}\n ✍️ <b>{tasks_sql[i][1]}</b>\n{separator}")
+
+        for task_completely in tasks_completely:
+            if (task_completely[0] == tasks_sql[i][1]): 
+                done = True
+                break
+        
+        if (tasks_sql[i][3] == 'bool'): keyboard = task_bool_kb
+
+        if (done): await message.answer(f'✅ {tasks_sql[i][1]}', reply_markup = complete_kb)
+
+        else: await message.answer(f"❗️ {tasks_sql[i][2]}", reply_markup = keyboard)
+
+        i += 1
+
 def commands_handler(dp: Dispatcher):
     dp.register_message_handler(start_handler, commands=['start'], state = '*')
     dp.register_message_handler(open_handler, commands=['open'], state = '*')
     dp.register_message_handler(role_handler, commands=['role'], state = '*')
     dp.register_message_handler(close_handler, commands=['close'], state = '*')
+    dp.register_message_handler(everyday_task_handler, commands=['everyday'], state = '*')
 
 ## open - Открыть смену
 ## close - Закрыть смену
